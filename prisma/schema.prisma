@@ -1,0 +1,782 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  CUSTOMER
+  AGENT
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SUSPENDED
+}
+
+enum TierLevel {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+enum UserTier {
+  STANDARD
+  PREMIUM
+  VIP
+}
+
+enum AdminLevel {
+  STAFF
+  MANAGER
+  DIRECTOR
+  SUPER_ADMIN
+}
+
+enum PackageCategory {
+  CULTURAL
+  ADVENTURE
+  BEACH
+  WELLNESS
+  LUXURY
+  FAMILY
+  HONEYMOON
+  BUSINESS
+  CUSTOM
+}
+
+enum DifficultyLevel {
+  EASY
+  MODERATE
+  CHALLENGING
+  EXTREME
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  BANK_TRANSFER
+  PAYPAL
+  CRYPTO
+  CASH
+}
+
+enum CommissionStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+}
+
+enum ActivityType {
+  USER_REGISTERED
+  USER_UPDATED
+  QUOTE_CREATED
+  QUOTE_SENT
+  QUOTE_ACCEPTED
+  QUOTE_REJECTED
+  BOOKING_CREATED
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  PAYMENT_CREATED
+  PAYMENT_SUCCEEDED
+  PAYMENT_FAILED
+  REVIEW_CREATED
+  PACKAGE_CREATED
+  PACKAGE_UPDATED
+  AGENT_ASSIGNED
+  COMMISSION_CALCULATED
+  MESSAGE_SENT
+  LOGIN
+  LOGOUT
+  SYSTEM_ACTION
+}
+
+enum QuoteStatus {
+  DRAFT
+  SENT
+  VIEWED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum BookingStatus {
+  CONFIRMED
+  PENDING
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  REFUNDED
+  PARTIALLY_PAID
+}
+
+enum SeasonType {
+  LOW
+  MEDIUM
+  HIGH
+  PEAK
+}
+
+// Core Models
+model User {
+  id        String     @id @default(cuid())
+  clerkId   String     @unique
+  email     String     @unique
+  firstName String?
+  lastName  String?
+  phone     String?
+  avatar    String?
+  role      UserRole   @default(CUSTOMER)
+  status    UserStatus @default(PENDING)
+  tier      UserTier   @default(STANDARD)
+  isActive  Boolean    @default(true)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  // Relationships
+  agent        Agent?
+  admin        Admin?
+  quotes       Quote[]
+  bookings     Booking[]
+  reviews      Review[]
+  payments     Payment[]
+  messages     Message[]
+  activities   Activity[]
+  securityLogs SecurityLog[]
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Agent {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  contactPerson   String
+  companyName     String
+  phone           String
+  whatsapp        String
+  country         String
+  city            String
+  experience      String
+  specialization  String[]
+  website         String?
+  socialMedia     Json?
+  businessLicense String?
+  tier            TierLevel @default(BRONZE)
+  totalPax        Int       @default(0)
+  paxThisMonth    Int       @default(0)
+  totalRevenue    Decimal   @default(0) @db.Decimal(10, 2)
+  conversionRate  Decimal   @default(0) @db.Decimal(5, 2)
+  lastActive      DateTime  @default(now())
+  preferences     Json?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relationships
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quotes      Quote[]
+  bookings    Booking[]
+  packages    Package[]
+  commissions Commission[]
+  reviews     Review[]
+  activities  Activity[]
+
+  @@map("agents")
+}
+
+model Admin {
+  id            String     @id @default(cuid())
+  userId        String     @unique
+  contactPerson String
+  permissions   String[]
+  department    String?
+  level         AdminLevel @default(STAFF)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  // Relationships
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activities Activity[]
+
+  @@map("admins")
+}
+
+model Package {
+  id              String          @id @default(cuid())
+  title           String
+  slug            String          @unique
+  name            String // Keep for backward compatibility
+  description     String
+  shortDesc       String?
+  category        PackageCategory @default(CUSTOM)
+  duration        Int
+  maxPax          Int
+  minPax          Int             @default(1)
+  basePrice       Decimal         @db.Decimal(10, 2)
+  images          String[]
+  highlights      String[]
+  inclusions      String[]
+  exclusions      String[]
+  itinerary       Json
+  location        String          @default("Bali")
+  difficulty      DifficultyLevel @default(EASY)
+  isActive        Boolean         @default(true)
+  isFeatured      Boolean         @default(false)
+  tags            String[]
+  seoTitle        String?
+  seoDesc         String?
+  rating          Float           @default(0.0)
+  reviewCount     Int             @default(0)
+  bookingCount    Int             @default(0)
+  popularityScore Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  // Relationships
+  agentId       String?
+  agent         Agent?         @relation(fields: [agentId], references: [id])
+  quotes        Quote[]
+  bookings      Booking[]
+  reviews       Review[]
+  activities    Activity[]
+  seasonalRates SeasonalRate[]
+
+  @@map("packages")
+}
+
+model Quote {
+  id              String      @id @default(cuid())
+  quoteNumber     String      @unique
+  agentId         String
+  packageId       String?
+  clientName      String
+  clientEmail     String
+  clientPhone     String?
+  clientWhatsapp  String?
+  duration        Int
+  startDate       DateTime?
+  endDate         DateTime?
+  paxDetails      Json
+  hotelOptions    Json
+  addOns          Json
+  customizations  Json?
+  markupType      String      @default("percentage")
+  markupValue     Decimal     @db.Decimal(5, 2)
+  basePrice       Decimal     @db.Decimal(10, 2)
+  totalPrice      Decimal     @db.Decimal(10, 2)
+  agentCommission Decimal     @db.Decimal(10, 2)
+  status          QuoteStatus @default(DRAFT)
+  validUntil      DateTime
+  notes           String?
+  internalNotes   String?
+  sentAt          DateTime?
+  viewedAt        DateTime?
+  respondedAt     DateTime?
+  isItemized      Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  // Relationships
+  agent      Agent       @relation(fields: [agentId], references: [id])
+  package    Package?    @relation(fields: [packageId], references: [id])
+  customer   User        @relation(fields: [clientEmail], references: [email])
+  booking    Booking?
+  activities Activity[]
+  items      QuoteItem[]
+
+  @@map("quotes")
+}
+
+model QuoteItem {
+  id              String   @id @default(cuid())
+  quoteId         String
+  itemType        String   // HOTEL, ACTIVITY, ADDON, TRANSPORT, MEAL
+  itemId          String   // Reference to hotel, activity, addon, etc.
+  itemName        String
+  description     String?
+  quantity        Int      @default(1)
+  nights          Int?     // For hotels
+  pax             Int      @default(1)
+  unitPrice       Decimal  @db.Decimal(10, 2)
+  totalPrice      Decimal  @db.Decimal(10, 2)
+  date            DateTime?
+  startDate       DateTime?
+  endDate         DateTime?
+  notes           String?
+  customizations  Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relationships
+  quote           Quote             @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  hotel           Hotel?            @relation(fields: [hotelId], references: [id])
+  hotelId         String?
+  hotelRoom       HotelRoom?        @relation(fields: [hotelRoomId], references: [id])
+  hotelRoomId     String?
+  activity        BookableActivity? @relation(fields: [activityId], references: [id])
+  activityId      String?
+  addon           AddOn?            @relation(fields: [addonId], references: [id])
+  addonId         String?
+
+  @@map("quote_items")
+}
+
+model Booking {
+  id                 String        @id @default(cuid())
+  quoteId            String        @unique
+  agentId            String
+  bookingRef         String        @unique
+  clientName         String
+  clientEmail        String
+  clientPhone        String?
+  totalAmount        Decimal       @db.Decimal(10, 2)
+  paidAmount         Decimal       @default(0) @db.Decimal(10, 2)
+  pendingAmount      Decimal       @db.Decimal(10, 2)
+  status             BookingStatus @default(PENDING)
+  paymentStatus      PaymentStatus @default(PENDING)
+  checkInDate        DateTime
+  checkOutDate       DateTime
+  specialRequests    String?
+  internalNotes      String?
+  confirmedAt        DateTime?
+  cancelledAt        DateTime?
+  cancellationReason String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  // Relationships
+  quote      Quote      @relation(fields: [quoteId], references: [id])
+  agent      Agent      @relation(fields: [agentId], references: [id])
+  customer   User       @relation(fields: [clientEmail], references: [email])
+  payments   Payment[]
+  reviews    Review[]
+  activities Activity[]
+  Package    Package?   @relation(fields: [packageId], references: [id])
+  packageId  String?
+
+  @@map("bookings")
+}
+
+model SeasonalRate {
+  id          String     @id @default(cuid())
+  packageId   String
+  seasonType  SeasonType
+  multiplier  Decimal    @db.Decimal(3, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  package Package @relation(fields: [packageId], references: [id])
+
+  @@map("seasonal_rates")
+}
+
+model Payment {
+  id                    String        @id @default(cuid())
+  bookingId             String
+  amount                Decimal       @db.Decimal(10, 2)
+  currency              String        @default("USD")
+  status                PaymentStatus @default(PENDING)
+  paymentMethod         String?
+  stripePaymentIntentId String?       @unique
+  razorpayPaymentId     String?       @unique
+  transactionId         String?
+  paidAt                DateTime?
+  failedAt              DateTime?
+  failureReason         String?
+  refundedAt            DateTime?
+  refundAmount          Decimal?      @db.Decimal(10, 2)
+  refundReason          String?
+  metadata              Json?
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  // Relationships
+  booking    Booking    @relation(fields: [bookingId], references: [id])
+  activities Activity[]
+  User       User?      @relation(fields: [userId], references: [id])
+  userId     String?
+
+  @@map("payments")
+}
+
+model Hotel {
+  id          String      @id @default(cuid())
+  name        String
+  category    String
+  location    String
+  description String
+  amenities   String[]
+  images      String[]
+  priceRange  Json
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relationships
+  rooms       HotelRoom[]
+  quoteItems  QuoteItem[]
+
+  @@map("hotels")
+}
+
+model HotelRoom {
+  id          String   @id @default(cuid())
+  hotelId     String
+  name        String
+  type        String   // STANDARD, DELUXE, SUITE, VILLA
+  capacity    Int
+  basePrice   Decimal  @db.Decimal(10, 2)
+  description String?
+  amenities   String[]
+  images      String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  hotel       Hotel       @relation(fields: [hotelId], references: [id], onDelete: Cascade)
+  quoteItems  QuoteItem[]
+  seasonalRates HotelSeasonalRate[]
+
+  @@map("hotel_rooms")
+}
+
+model HotelSeasonalRate {
+  id          String     @id @default(cuid())
+  roomId      String
+  seasonType  SeasonType
+  multiplier  Decimal    @db.Decimal(3, 2)
+  fixedPrice  Decimal?   @db.Decimal(10, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  room        HotelRoom  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("hotel_seasonal_rates")
+}
+
+model BookableActivity {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String   // CULTURAL, ADVENTURE, WELLNESS, TRANSPORT, etc.
+  type        String   // TOUR, EXPERIENCE, TRANSFER, MEAL, etc.
+  basePrice   Decimal  @db.Decimal(10, 2)
+  duration    String?  // "2 hours", "Half day", "Full day"
+  location    String?
+  maxPax      Int?
+  minPax      Int      @default(1)
+  images      String[]
+  highlights  String[]
+  inclusions  String[]
+  exclusions  String[]
+  requirements String[] // Age limit, fitness level, etc.
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  quoteItems    QuoteItem[]
+  seasonalRates ActivitySeasonalRate[]
+
+  @@map("bookable_activities")
+}
+
+model ActivitySeasonalRate {
+  id          String     @id @default(cuid())
+  activityId  String
+  seasonType  SeasonType
+  multiplier  Decimal    @db.Decimal(3, 2)
+  fixedPrice  Decimal?   @db.Decimal(10, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  description String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relationships
+  activity    BookableActivity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@map("activity_seasonal_rates")
+}
+
+model AddOn {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  category    String
+  price       Decimal  @db.Decimal(10, 2)
+  duration    String?
+  location    String?
+  images      String[]
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships
+  quoteItems  QuoteItem[]
+
+  @@map("add_ons")
+}
+
+model TierConfig {
+  id              String    @id @default(cuid())
+  tier            TierLevel @unique
+  minPax          Int
+  minRevenue      Decimal   @db.Decimal(10, 2)
+  discountPercent Decimal   @db.Decimal(5, 2)
+  benefits        String[]
+  commissionRate  Decimal   @db.Decimal(5, 2)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("tier_configs")
+}
+
+// AI and Automation Models
+model AIConversation {
+  id        String   @id @default(cuid())
+  agentId   String?
+  sessionId String
+  messages  Json
+  context   Json?
+  status    String   @default("active")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ai_conversations")
+}
+
+model WhatsAppMessage {
+  id          String    @id @default(cuid())
+  phoneNumber String
+  messageType String
+  content     Json
+  status      String    @default("pending")
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  readAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("whatsapp_messages")
+}
+
+// Analytics and Tracking
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventType  String
+  entityType String
+  entityId   String
+  agentId    String?
+  data       Json
+  timestamp  DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  @@map("analytics_events")
+}
+
+// Additional Models
+model Commission {
+  id         String           @id @default(cuid())
+  agentId    String
+  agent      Agent            @relation(fields: [agentId], references: [id])
+  bookingId  String?
+  amount     Decimal          @db.Decimal(10, 2)
+  percentage Decimal          @db.Decimal(5, 2)
+  status     CommissionStatus @default(PENDING)
+  paidAt     DateTime?
+  notes      String?
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@map("commissions")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  packageId  String
+  package    Package  @relation(fields: [packageId], references: [id])
+  bookingId  String?
+  booking    Booking? @relation(fields: [bookingId], references: [id])
+  customerId String
+  customer   User     @relation(fields: [customerId], references: [id])
+  agentId    String?
+  agent      Agent?   @relation(fields: [agentId], references: [id])
+
+  rating  Int // 1-5 stars
+  title   String?
+  comment String
+  images  String[]
+
+  isVerified Boolean @default(false)
+  isPublic   Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("reviews")
+}
+
+model Message {
+  id          String      @id @default(cuid())
+  senderId    String
+  sender      User        @relation(fields: [senderId], references: [id])
+  receiverId  String?
+  content     String
+  type        MessageType @default(TEXT)
+  attachments String[]
+  isRead      Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@map("messages")
+}
+
+model Activity {
+  id          String       @id @default(cuid())
+  type        ActivityType
+  description String
+  metadata    Json?
+
+  // Relations
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  agentId   String?
+  agent     Agent?   @relation(fields: [agentId], references: [id])
+  adminId   String?
+  admin     Admin?   @relation(fields: [adminId], references: [id])
+  packageId String?
+  package   Package? @relation(fields: [packageId], references: [id])
+  quoteId   String?
+  quote     Quote?   @relation(fields: [quoteId], references: [id])
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id])
+  paymentId String?
+  payment   Payment? @relation(fields: [paymentId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@map("activities")
+}
+
+// Security Models
+model SecurityLog {
+  id        String   @id @default(cuid())
+  event     String
+  severity  String // LOW, MEDIUM, HIGH, CRITICAL
+  source    String // API, AUTH, PAYMENT, etc.
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([event])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("security_logs")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  resource   String
+  resourceId String?
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+  oldValues  Json?
+  newValues  Json?
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([action])
+  @@index([resource])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+model Role {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  resource    String
+  action      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  roles RolePermission[]
+
+  @@index([resource, action])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(cuid())
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permissionId String
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// Indexes for performance
+// These will be created automatically by Prisma
+// Additional indexes can be added as needed

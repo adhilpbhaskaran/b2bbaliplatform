@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Builder - Bali Malayali DMC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .step-active { background: #3B82F6; color: white; }
+        .step-completed { background: #10B981; color: white; }
+        .step-inactive { background: #E5E7EB; color: #6B7280; }
+        .option-card { border: 2px solid #E5E7EB; transition: all 0.3s ease; }
+        .option-card.selected { border-color: #3B82F6; background: #EFF6FF; }
+        .hotel-card { border: 1px solid #E5E7EB; transition: all 0.3s ease; }
+        .hotel-card:hover { border-color: #3B82F6; }
+        .hotel-card.selected { border-color: #3B82F6; background: #EFF6FF; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="dashboard.html" class="flex items-center">
+                        <i class="fas fa-arrow-left text-gray-600 mr-3"></i>
+                        <img src="https://via.placeholder.com/150x50/667eea/ffffff?text=Bali+Malayali" alt="Bali Malayali DMC" class="h-10">
+                    </a>
+                    <span class="ml-4 text-gray-600">Quote Builder</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="saveDraft()" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-save mr-2"></i>Save Draft
+                    </button>
+                    <button onclick="logout()" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Progress Steps -->
+    <div class="bg-white border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <div id="step1" class="step-active w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
+                        1
+                    </div>
+                    <div class="w-16 h-1 bg-gray-300"></div>
+                    <div id="step2" class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
+                        2
+                    </div>
+                    <div class="w-16 h-1 bg-gray-300"></div>
+                    <div id="step3" class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
+                        3
+                    </div>
+                    <div class="w-16 h-1 bg-gray-300"></div>
+                    <div id="step4" class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
+                        4
+                    </div>
+                    <div class="w-16 h-1 bg-gray-300"></div>
+                    <div id="step5" class="step-inactive w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
+                        5
+                    </div>
+                </div>
+                <div class="text-sm text-gray-600">
+                    Step <span id="currentStep">1</span> of 5
+                </div>
+            </div>
+            <div class="mt-2">
+                <div class="text-sm text-gray-600">
+                    <span id="stepTitle">Basic Information</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Step 1: Basic Info -->
+        <div id="stepContent1" class="step-content">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6">Basic Information</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Client Name *</label>
+                        <input type="text" id="clientName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Enter client name" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Travel Dates *</label>
+                        <input type="date" id="travelDate" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6 mt-6">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Adults *</label>
+                        <input type="number" id="adults" min="1" value="2" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Child with Bed</label>
+                        <input type="number" id="childWithBed" min="0" value="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Child without Bed</label>
+                        <input type="number" id="childWithoutBed" min="0" value="0" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div class="mt-6">
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <h4 class="font-semibold text-blue-800 mb-2">Pax Summary</h4>
+                        <p class="text-blue-700">Total Pax: <span id="totalPax">2</span></p>
+                        <p class="text-blue-700">Estimated Rooms: <span id="estimatedRooms">1</span></p>
+                        <p class="text-blue-700">Recommended Vehicle: <span id="recommendedVehicle">Avanza (6 seater)</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Package Selection -->
+        <div id="stepContent2" class="step-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6">Select Base Package</h2>
+                <div class="grid md:grid-cols-3 gap-6" id="packageOptions">
+                    <!-- Package options will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Quote Options -->
+        <div id="stepContent3" class="step-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Create Quote Options (1-3)</h2>
+                    <button onclick="addQuoteOption()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                        <i class="fas fa-plus mr-2"></i>Add Option
+                    </button>
+                </div>
+                <div id="quoteOptions" class="space-y-6">
+                    <!-- Quote options will be added here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Markup & Pricing -->
+        <div id="stepContent4" class="step-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6">Markup & Final Pricing</h2>
+                <div id="markupOptions" class="space-y-6">
+                    <!-- Markup options will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Preview & Generate -->
+        <div id="stepContent5" class="step-content hidden">
+            <div class="bg-white rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold mb-6">Quote Preview</h2>
+                <div id="quotePreview" class="space-y-6">
+                    <!-- Quote preview will be loaded here -->
+                </div>
+                <div class="mt-8 flex justify-center space-x-4">
+                    <button onclick="downloadPDF()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold">
+                        <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                    </button>
+                    <button onclick="sendToEmail()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
+                        <i class="fas fa-envelope mr-2"></i>Send to My Email
+                    </button>
+                    <button onclick="sendToWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp Preview
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex justify-between mt-8">
+            <button id="prevBtn" onclick="previousStep()" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold hidden">
+                <i class="fas fa-arrow-left mr-2"></i>Previous
+            </button>
+            <div class="flex-1"></div>
+            <button id="nextBtn" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold">
+                Next <i class="fas fa-arrow-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Hotel Selection Modal -->
+    <div id="hotelModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-4xl w-full max-h-screen overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-xl font-bold">Select Hotel for <span id="modalLocation"></span></h3>
+                        <button onclick="closeHotelModal()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    <div id="hotelOptions" class="grid md:grid-cols-2 gap-4">
+                        <!-- Hotel options will be loaded here -->
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="closeHotelModal()" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg mr-3">
+                            Cancel
+                        </button>
+                        <button onclick="confirmHotelSelection()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+                            Confirm Selection
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="quote-builder.js"></script>
+</body>
+</html>

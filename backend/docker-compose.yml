@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: balidmc_db
+    environment:
+      POSTGRES_DB: balidmc_db
+      POSTGRES_USER: balidmc_user
+      POSTGRES_PASSWORD: balidmc_password
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - balidmc_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U balidmc_user -d balidmc_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: balidmc_api
+    environment:
+      - DATABASE_URL=postgresql://balidmc_user:balidmc_password@db:5432/balidmc_db
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=balidmc_db
+      - DATABASE_USER=balidmc_user
+      - DATABASE_PASSWORD=balidmc_password
+      - ENVIRONMENT=development
+      - DEBUG=true
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      - ALLOWED_ORIGINS=http://localhost:3000,http://localhost:3001
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    networks:
+      - balidmc_network
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn main:app --host 0.0.0.0 --port 8001 --reload"
+
+  # Redis (Optional - for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: balidmc_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - balidmc_network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # pgAdmin (Optional - for database management)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: balidmc_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@balidmc.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - balidmc_network
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  balidmc_network:
+    driver: bridge

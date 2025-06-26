@@ -1,0 +1,341 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: balidmc_db_prod
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-balidmc_db}
+      POSTGRES_USER: ${DATABASE_USER:-balidmc_user}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: md5
+    ports:
+      - "127.0.0.1:5432:5432"  # Only bind to localhost
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./backups:/backups
+    networks:
+      - balidmc_network_prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-balidmc_user} -d ${DATABASE_NAME:-balidmc_db}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # FastAPI Backend
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: balidmc_api_prod
+    environment:
+      - DATABASE_URL=postgresql://${DATABASE_USER:-balidmc_user}:${DATABASE_PASSWORD}@db:5432/${DATABASE_NAME:-balidmc_db}
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=${DATABASE_NAME:-balidmc_db}
+      - DATABASE_USER=${DATABASE_USER:-balidmc_user}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - CLERK_PUBLISHABLE_KEY=${CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+      - CLERK_WEBHOOK_SECRET=${CLERK_WEBHOOK_SECRET}
+      - SECRET_KEY=${SECRET_KEY}
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - API_HOST=0.0.0.0
+      - API_PORT=8001
+      - API_WORKERS=${API_WORKERS:-4}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+    ports:
+      - "127.0.0.1:8001:8001"  # Only bind to localhost
+    volumes:
+      - ./logs:/app/logs
+      - ./backups:/app/backups:ro
+    networks:
+      - balidmc_network_prod
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
+    command: >
+      sh -c "alembic upgrade head &&
+             gunicorn main:app 
+             --workers ${API_WORKERS:-4} 
+             --worker-class uvicorn.workers.UvicornWorker 
+             --bind 0.0.0.0:8001 
+             --timeout 30 
+             --keepalive 2 
+             --max-requests 1000 
+             --max-requests-jitter 100 
+             --access-logfile /app/logs/access.log 
+             --error-logfile /app/logs/error.log 
+             --log-level ${LOG_LEVEL:-info}"
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: balidmc_redis_prod
+    ports:
+      - "127.0.0.1:6379:6379"  # Only bind to localhost
+    volumes:
+      - redis_data_prod:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - balidmc_network_prod
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: balidmc_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/sites-available:/etc/nginx/sites-available:ro
+      - ./nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./logs/nginx:/var/log/nginx
+      - ./static:/var/www/static:ro
+    networks:
+      - balidmc_network_prod
+    depends_on:
+      - api
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+        reservations:
+          memory: 128M
+          cpus: '0.25'
+
+  # Database backup service
+  db-backup:
+    image: postgres:15-alpine
+    container_name: balidmc_backup_prod
+    environment:
+      - PGPASSWORD=${DATABASE_PASSWORD}
+    volumes:
+      - ./backups:/backups
+      - ./scripts/backup.sh:/backup.sh:ro
+    networks:
+      - balidmc_network_prod
+    depends_on:
+      - db
+    restart: "no"
+    profiles:
+      - backup
+    command: >
+      sh -c "chmod +x /backup.sh && 
+             echo '0 2 * * * /backup.sh' | crontab - && 
+             crond -f"
+
+  # Log aggregation (optional)
+  fluentd:
+    image: fluent/fluentd:v1.16-debian-1
+    container_name: balidmc_fluentd_prod
+    volumes:
+      - ./fluentd/fluent.conf:/fluentd/etc/fluent.conf:ro
+      - ./logs:/var/log/app:ro
+    networks:
+      - balidmc_network_prod
+    restart: unless-stopped
+    profiles:
+      - logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.25'
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: balidmc_prometheus_prod
+    ports:
+      - "127.0.0.1:9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data_prod:/prometheus
+    networks:
+      - balidmc_network_prod
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # Grafana for monitoring dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: balidmc_grafana_prod
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - grafana_data_prod:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - balidmc_network_prod
+    restart: unless-stopped
+    profiles:
+      - monitoring
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.5'
+
+volumes:
+  postgres_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/balidmc/data/postgres
+  redis_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/balidmc/data/redis
+  prometheus_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/balidmc/data/prometheus
+  grafana_data_prod:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /opt/balidmc/data/grafana
+
+networks:
+  balidmc_network_prod:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+    driver_opts:
+      com.docker.network.bridge.name: br-balidmc-prod
+
+# Production deployment commands:
+# 
+# 1. Basic deployment:
+#    docker-compose -f docker-compose.prod.yml up -d
+# 
+# 2. With monitoring:
+#    docker-compose -f docker-compose.prod.yml --profile monitoring up -d
+# 
+# 3. With logging:
+#    docker-compose -f docker-compose.prod.yml --profile logging up -d
+# 
+# 4. Full deployment with all services:
+#    docker-compose -f docker-compose.prod.yml --profile monitoring --profile logging --profile backup up -d
+# 
+# 5. Scale API service:
+#    docker-compose -f docker-compose.prod.yml up -d --scale api=3
+# 
+# 6. Update and restart:
+#    docker-compose -f docker-compose.prod.yml pull
+#    docker-compose -f docker-compose.prod.yml up -d --force-recreate
+# 
+# 7. Backup database:
+#    docker-compose -f docker-compose.prod.yml --profile backup run --rm db-backup
+# 
+# 8. View logs:
+#    docker-compose -f docker-compose.prod.yml logs -f api
+# 
+# 9. Stop all services:
+#    docker-compose -f docker-compose.prod.yml down
+# 
+# 10. Stop and remove volumes (DANGER - will delete data):
+#     docker-compose -f docker-compose.prod.yml down -v

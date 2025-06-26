@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bali Malayali DMC - B2B Travel Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <img src="https://via.placeholder.com/150x50/667eea/ffffff?text=Bali+Malayali" alt="Bali Malayali DMC" class="h-10">
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button onclick="showLogin()" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-sign-in-alt mr-2"></i>Login
+                    </button>
+                    <button onclick="showRegister()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                        <i class="fas fa-user-plus mr-2"></i>Register Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-6">
+                Build, Brand, and Sell Bali Packages in Minutes
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                The complete B2B platform for travel agents selling Bali experiences
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button onclick="showRegister()" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    Start Building Quotes
+                </button>
+                <button onclick="scrollToFeatures()" class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">
+                    See How It Works
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How It Works</h2>
+                <p class="text-xl text-gray-600">Simple 4-step process to create professional Bali quotes</p>
+            </div>
+            <div class="grid md:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-user-check text-blue-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">1. Register & Get Approved</h3>
+                    <p class="text-gray-600">Quick registration process with instant WhatsApp approval</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-green-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-edit text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">2. Build Custom Quotes</h3>
+                    <p class="text-gray-600">Use our smart quote builder with multiple options</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-palette text-purple-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">3. Brand & Customize</h3>
+                    <p class="text-gray-600">Add your logo, markup, and contact details</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-orange-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-share text-orange-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">4. Share & Convert</h3>
+                    <p class="text-gray-600">Download PDF or share via WhatsApp/Email</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Powerful Features</h2>
+                <p class="text-xl text-gray-600">Everything you need to grow your Bali travel business</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-calculator text-blue-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">Smart Quote Builder</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Multi-option quotes (1-3 variations)</li>
+                        <li>• Auto room & vehicle calculation</li>
+                        <li>• Live markup preview</li>
+                        <li>• Professional PDF generation</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-chart-line text-green-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">Agent Dashboard</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Revenue tracking & analytics</li>
+                        <li>• Conversion rate monitoring</li>
+                        <li>• Tier progression system</li>
+                        <li>• Marketing asset library</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-award text-purple-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">Tier System</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Bronze → Silver → Gold → Platinum</li>
+                        <li>• Progressive discounts up to $20/pax</li>
+                        <li>• Monthly tier evaluation</li>
+                        <li>• Exclusive benefits per tier</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-mobile-alt text-orange-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">WhatsApp Integration</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Direct quote sharing</li>
+                        <li>• Instant approval notifications</li>
+                        <li>• Client communication tools</li>
+                        <li>• Mobile-first design</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-shield-alt text-red-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">White-Label Branding</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Your logo on all quotes</li>
+                        <li>• Custom contact details</li>
+                        <li>• Professional presentation</li>
+                        <li>• Zero platform visibility</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg card-hover">
+                    <i class="fas fa-cogs text-indigo-600 text-3xl mb-4"></i>
+                    <h3 class="text-xl font-semibold mb-4">Smart Automation</h3>
+                    <ul class="text-gray-600 space-y-2">
+                        <li>• Auto tier calculations</li>
+                        <li>• Monthly reporting</li>
+                        <li>• AI-powered suggestions</li>
+                        <li>• Booking management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Work With Us -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Work With Us</h2>
+                <p class="text-xl text-gray-600">Trusted by 500+ travel agents across India and Dubai</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-blue-600 mb-2">500+</div>
+                    <p class="text-gray-600">Active Agents</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-green-600 mb-2">10K+</div>
+                    <p class="text-gray-600">Quotes Generated</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-purple-600 mb-2">95%</div>
+                    <p class="text-gray-600">Client Satisfaction</p>
+                </div>
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-orange-600 mb-2">24/7</div>
+                    <p class="text-gray-600">Support Available</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Bali -->
+    <section class="py-20 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Discover the Magic of Bali</h2>
+                <p class="text-xl text-gray-600">Indonesia's crown jewel offering unforgettable experiences for every traveler</p>
+            </div>
+            
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Why Bali is Perfect for Your Clients</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <i class="fas fa-temple-buddhist text-orange-500 text-xl mt-1 mr-4"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Rich Cultural Heritage</h4>
+                                <p class="text-gray-600">Ancient temples, traditional ceremonies, and authentic Balinese culture</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-umbrella-beach text-blue-500 text-xl mt-1 mr-4"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Stunning Beaches</h4>
+                                <p class="text-gray-600">From Seminyak's sunset beaches to Nusa Dua's pristine shores</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-mountain text-green-500 text-xl mt-1 mr-4"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">Breathtaking Nature</h4>
+                                <p class="text-gray-600">Volcanic mountains, rice terraces, and tropical rainforests</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <i class="fas fa-spa text-purple-500 text-xl mt-1 mr-4"></i>
+                            <div>
+                                <h4 class="font-semibold text-gray-900">World-Class Wellness</h4>
+                                <p class="text-gray-600">Traditional spas, yoga retreats, and holistic healing experiences</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="https://via.placeholder.com/300x200/667eea/ffffff?text=Ubud+Rice+Terraces" alt="Ubud Rice Terraces" class="rounded-lg shadow-lg">
+                    <img src="https://via.placeholder.com/300x200/764ba2/ffffff?text=Tanah+Lot+Temple" alt="Tanah Lot Temple" class="rounded-lg shadow-lg">
+                    <img src="https://via.placeholder.com/300x200/667eea/ffffff?text=Seminyak+Beach" alt="Seminyak Beach" class="rounded-lg shadow-lg">
+                    <img src="https://via.placeholder.com/300x200/764ba2/ffffff?text=Mount+Batur" alt="Mount Batur" class="rounded-lg shadow-lg">
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-8">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-4">Popular Bali Destinations We Cover</h3>
+                    <p class="text-gray-600">Expertly curated experiences across Bali's most sought-after locations</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                        <i class="fas fa-leaf text-green-600 text-2xl mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">Ubud</h4>
+                        <p class="text-sm text-gray-600">Cultural heart, rice terraces, art villages</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                        <i class="fas fa-cocktail text-orange-600 text-2xl mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">Seminyak</h4>
+                        <p class="text-sm text-gray-600">Beach clubs, luxury resorts, nightlife</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                        <i class="fas fa-water text-blue-600 text-2xl mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">Nusa Dua</h4>
+                        <p class="text-sm text-gray-600">Pristine beaches, luxury hotels, golf</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md text-center card-hover">
+                        <i class="fas fa-fire text-red-600 text-2xl mb-3"></i>
+                        <h4 class="font-semibold text-gray-900 mb-2">Kintamani</h4>
+                        <p class="text-sm text-gray-600">Mount Batur, hot springs, volcano tours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Meet the Team -->
+    <section class="py-20 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
+                <p class="text-xl text-gray-600">Bali experts ready to support your business growth</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-8 rounded-xl shadow-lg text-center card-hover">
+                    <img src="https://via.placeholder.com/150x150/667eea/ffffff?text=Team+1" alt="Team Member" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold mb-2">Rajesh Kumar</h3>
+                    <p class="text-gray-600 mb-4">Founder & Bali Expert</p>
+                    <a href="https://wa.me/+919876543210" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </a>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg text-center card-hover">
+                    <img src="https://via.placeholder.com/150x150/667eea/ffffff?text=Team+2" alt="Team Member" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold mb-2">Priya Nair</h3>
+                    <p class="text-gray-600 mb-4">Operations Manager</p>
+                    <a href="https://wa.me/+919876543211" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </a>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg text-center card-hover">
+                    <img src="https://via.placeholder.com/150x150/667eea/ffffff?text=Team+3" alt="Team Member" class="w-24 h-24 rounded-full mx-auto mb-4">
+                    <h3 class="text-xl font-semibold mb-2">Arjun Menon</h3>
+                    <p class="text-gray-600 mb-4">Customer Success</p>
+                    <a href="https://wa.me/+919876543212" target="_blank" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg inline-flex items-center">
+                        <i class="fab fa-whatsapp mr-2"></i>WhatsApp
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Ready to Transform Your Bali Business?</h2>
+            <p class="text-xl mb-8 opacity-90">Join hundreds of successful travel agents already using our platform</p>
+            <button onclick="showRegister()" class="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition">
+                Register Now - It's Free!
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8">
+                <div>
+                    <img src="https://via.placeholder.com/150x50/ffffff/667eea?text=Bali+Malayali" alt="Bali Malayali DMC" class="h-10 mb-4">
+                    <p class="text-gray-400">Your trusted partner for Bali travel experiences</p>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#how-it-works" class="hover:text-white">How It Works</a></li>
+                        <li><a href="#features" class="hover:text-white">Features</a></li>
+                        <li><a href="#" onclick="showLogin()" class="hover:text-white">Login</a></li>
+                        <li><a href="#" onclick="showRegister()" class="hover:text-white">Register</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="#" class="hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                        <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><i class="fas fa-envelope mr-2"></i>info@balimalayali.com</li>
+                        <li><i class="fas fa-phone mr-2"></i>+91 98765 43210</li>
+                        <li><i class="fab fa-whatsapp mr-2"></i>WhatsApp Support</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2024 Bali Malayali DMC. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Agent Login</h2>
+                    <button onclick="hideLogin()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="loginForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password</label>
+                        <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Login
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-gray-600">
+                    Don't have an account? 
+                    <a href="#" onclick="hideLogin(); showRegister();" class="text-blue-600 hover:underline">Register here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full p-6 max-h-screen overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Agent Registration</h2>
+                    <button onclick="hideRegister()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="registerForm">
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Contact Person Name *</label>
+                        <input type="text" id="contactPerson" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">WhatsApp Number *</label>
+                        <input type="tel" id="whatsapp" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email *</label>
+                        <input type="email" id="email" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Password *</label>
+                        <input type="password" id="password" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Company Name</label>
+                        <input type="text" id="companyName" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Optional if freelancer">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Business Type *</label>
+                        <select id="businessType" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" required>
+                            <option value="">Select Business Type</option>
+                            <option value="Registered Company">Registered Company</option>
+                            <option value="Freelancer">Freelancer</option>
+                            <option value="Travel Startup">Travel Startup</option>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Instagram/Facebook Page</label>
+                        <input type="url" id="socialMedia" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Optional">
+                    </div>
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Website URL</label>
+                        <input type="url" id="website" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:border-blue-500" placeholder="Optional">
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                        Register Now
+                    </button>
+                </form>
+                <p class="text-center mt-4 text-gray-600">
+                    Already have an account? 
+                    <a href="#" onclick="hideRegister(); showLogin();" class="text-blue-600 hover:underline">Login here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

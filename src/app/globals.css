@@ -1,0 +1,275 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 174 85% 27%; /* Emerald Green #0E7A6A */
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 45 76% 53%; /* Sunset Gold #D4AF37 */
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 174 85% 27%;
+    --radius: 1rem;
+    
+    /* Bali Malayali Brand Colors */
+    --emerald-green: 174 85% 27%; /* #0E7A6A */
+    --sunset-gold: 45 76% 53%; /* #D4AF37 */
+    --ink-black: 220 26% 14%; /* #111827 */
+    --snow-white: 210 20% 98%; /* #F9FAFB */
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /* Bali Malayali Brand Gradients */
+  .gradient-bg-primary {
+    background: linear-gradient(135deg, #0E7A6A 0%, #065F46 100%);
+  }
+  
+  .gradient-bg-secondary {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%);
+  }
+  
+  .gradient-bg-sunset {
+    background: linear-gradient(135deg, #FF6B35 0%, #F7931E 50%, #FFD23F 100%);
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .card-hover:hover {
+    @apply transform -translate-y-2 shadow-xl;
+  }
+
+  /* Tier specific styles with brand colors */
+  .tier-bronze {
+    background: linear-gradient(135deg, #cd7f32 0%, #b8860b 100%);
+  }
+  
+  .tier-silver {
+    background: linear-gradient(135deg, #c0c0c0 0%, #a8a8a8 100%);
+  }
+  
+  .tier-gold {
+    background: linear-gradient(135deg, #D4AF37 0%, #B8941F 100%);
+  }
+  
+  .tier-platinum {
+    background: linear-gradient(135deg, #0E7A6A 0%, #065F46 100%);
+  }
+
+  /* Bali-themed decorative elements */
+  .bali-pattern {
+    background-image: radial-gradient(circle at 1px 1px, rgba(14, 122, 106, 0.15) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+  
+  .palm-shadow {
+    filter: drop-shadow(2px 4px 8px rgba(14, 122, 106, 0.3));
+  }
+  
+  /* Professional button styles */
+  .btn-primary {
+    @apply bg-[#D4AF37] text-[#111827] hover:bg-[#B8941F] font-semibold rounded-full transition-all duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-[#0E7A6A] text-white hover:bg-[#065F46] font-semibold rounded-full transition-all duration-300;
+  }
+
+  /* Status badges with brand colors */
+  .status-pending {
+    @apply bg-yellow-100 text-yellow-800 border-yellow-200;
+  }
+  
+  .status-approved {
+    @apply bg-[#0E7A6A]/10 text-[#0E7A6A] border-[#0E7A6A]/20;
+  }
+  
+  .status-rejected {
+    @apply bg-red-100 text-red-800 border-red-200;
+  }
+  
+  .status-confirmed {
+    @apply bg-blue-100 text-blue-800 border-blue-200;
+  }
+  
+  /* Premium styling for quotes and cards */
+  .quote-card {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden;
+  }
+  
+  .quote-card:hover {
+    @apply shadow-xl border-[#0E7A6A]/20 transform -translate-y-1;
+  }
+  
+  /* Bali-inspired text styles */
+  .text-brand-primary {
+    @apply text-[#0E7A6A];
+  }
+  
+  .text-brand-secondary {
+    @apply text-[#D4AF37];
+  }
+  
+  .text-brand-dark {
+    @apply text-[#111827];
+  }
+
+  /* Custom scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+
+  /* Loading spinner */
+  .spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+  }
+
+  /* Form styles */
+  .form-input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+  
+  .form-label {
+    @apply block text-sm font-medium text-gray-700 mb-1;
+  }
+  
+  .form-error {
+    @apply text-red-600 text-sm mt-1;
+  }
+
+  /* Button variants */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+  }
+  
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition-colors duration-200;
+  }
+  
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+  }
+  
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded-md transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+  
+  .animation-delay-600 {
+    animation-delay: 600ms;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+  
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Focus styles for better accessibility */
+.focus-visible:focus-visible {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card-hover:hover {
+    @apply border-2 border-blue-600;
+  }
+}
